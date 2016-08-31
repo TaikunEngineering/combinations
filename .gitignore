@@ -1,0 +1,9 @@
+.idea/
+coverage/
+out/
+target/
+.classpath
+.project
+*.eml
+*.iml
+*.userlibraries
