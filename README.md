@@ -3,6 +3,21 @@
 
 ----
 
+This utility was written to allow for combinatorial testing for the real world, where parameters aren't all independent,
+and where relations are more complicated than "all pairs".
+
+Combinator key features:
+- Supports arbitrary nCr/nPr combinations and permutations
+- Tuples lazily generated as a Stream
+- Allows for multiple-element literals (see the advanced combinator example)
+- Allows nesting of other combinatorial structures
+- Coded in a functional style (whether or not this is a "pro" is up to you)
+- One file, ~120 lines of logic
+
+Relation filter features:
+- Allows for arbitrary relations
+- Otherwise unremarkable
+
 ## Usage
 
 ### Combinator
@@ -101,6 +116,26 @@ new RelationFilter(advanced_comb, t(0, 1, 2, 6), t(3, 4, 5, 6)).get();
 [false, true, false, false, false, true, false]
 ```
 
+### As a TestNG data provider
+
+```java
+@DataProvider(name = "allpairs", parallel = true)
+public static Object[][] data() {
+  return new RelationFilter(
+      new Combinator()
+          .permuteOne("triangle", "square", "circle")
+          .permuteOne("solid", "outline")
+          .permuteTwo("red", "yellow", "green", "blue"),
+      ALL_PAIRS(4)
+  ).array();
+}
+
+@Test(dataProvider = "allpairs")
+public static void test(Shape shape, boolean filled, Color gradient1, Color gradient2) {
+  ...
+}
+```
+
 ## How to build
 
 Use Maven.
@@ -137,9 +172,9 @@ Supported systems?
 - I develop and test using Oracle 1.8 JDKs on Windows 10 and RHEL 7 on AMD64
 - However this should work on any compliant JVM
 - I will reproduce/test on Debian/Ubuntu if necessary
-- All other platforms have [paid support](support@taikun.engineering) available
+- All other platforms have [paid support](mailto:support@taikun.engineering) available
 
 Paid support?
 
-- [Available](support@taikun.engineering), including custom branches, 3rd party code integrations, faster response time,
-private bug tracker
+- [Available](mailto:support@taikun.engineering), including custom branches, 3rd party code integrations, faster
+response time, private bug tracker
