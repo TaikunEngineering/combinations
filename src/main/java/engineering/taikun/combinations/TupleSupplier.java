@@ -19,4 +19,14 @@ import java.util.stream.Stream;
 /**
  * Each supplied stream must be unique and return the same sequence
  */
-@FunctionalInterface public interface TupleSupplier extends Supplier<Stream<Tuple>> {}
+@FunctionalInterface public interface TupleSupplier extends Supplier<Stream<Tuple>> {
+
+	/**
+	 * <p>Compute the entire result and return it as two-dimensional array (tuples converted to arrays as well).</p>
+	 *
+	 * @return An Object[][] containing all of the resulting tuples
+	 */
+	default Object[][] array() {
+		return get().map(t -> t.o).toArray(Object[][]::new);
+	}
+}
