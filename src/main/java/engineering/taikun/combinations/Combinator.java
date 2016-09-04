@@ -72,7 +72,7 @@ public class Combinator implements TupleSupplier {
 	private static final Object[] EMPTY_OBJ_AR = new Object[0];
 	private static final Tuple PLACEHOLDER = t(EMPTY_OBJ_AR);
 
-	private final ArrayList<Factor> factors = new ArrayList<>();
+	final ArrayList<Factor> factors = new ArrayList<>();
 
 	/**
 	 * <p>Choose one object from the input.</p>
@@ -144,46 +144,47 @@ public class Combinator implements TupleSupplier {
 	}
 
 	/**
-	 * <p>Choose <tt>count</tt> objects from the supplied pool. Tuples that contain the same elements as a tuple
-	 * returned before, but in a different order, are ignored.</p>
+	 * <p>Choose <tt>r</tt> objects from the supplied pool. Tuples that contain the same elements as a tuple returned
+	 * before, but in a different order, are ignored.</p>
 	 *
-	 * <p>Multiplies the number of total results by N!/((N-C)!C!), where N is the count of the input and C is the count
+	 * <p>Multiplies the number of total results by N!/((N-R)!R!), where N is the count of the input and R is the count
 	 * chosen.</p>
 	 *
+	 * @param r The number of objects chosen
 	 * @param o The pool to choose from
 	 * @return The modifed Combinator
 	 */
-	public Combinator chooseN(final int count, final Object... o) {
-		this.factors.add(new Factor(true, count, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
+	public Combinator chooseR(final int r, final Object... o) {
+		this.factors.add(new Factor(true, r, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
 		return this;
 	}
 
 	/**
-	 * <p>Choose <tt>count</tt> objects from the supplied pool. Tuples that contain the same elements as a tuple
-	 * returned before, but in a different order, are ignored.</p>
+	 * <p>Choose <tt>r</tt> objects from the supplied pool. Tuples that contain the same elements as a tuple returned
+	 * before, but in a different order, are ignored.</p>
 	 *
-	 * <p>Multiplies the number of total results by N!/((N-C)!C!), where N is the count of the input and C is the count
+	 * <p>Multiplies the number of total results by N!/((N-R)!R!), where N is the count of the input and R is the count
 	 * chosen.</p>
 	 *
+	 * @param r The number of objects chosen
 	 * @param o The pool to choose from
 	 * @return The modifed Combinator
 	 */
-	public Combinator chooseN(final int count, final List<Object> o) {
-		this.factors.add(new Factor(true, count, () -> 0, () -> Collections.EMPTY_SET, o));
+	public Combinator chooseR(final int r, final List<Object> o) {
+		this.factors.add(new Factor(true, r, () -> 0, () -> Collections.EMPTY_SET, o));
 		return this;
 	}
 
 	/**
-	 * <p>Choose one object from the input.</p>
+	 * <p>Select one object from the input.</p>
 	 *
 	 * <p>Multiplies the number of total results by N, where N is the count of the input.</p>
 	 *
-	 * @param o The pool to choose from
+	 * @param o The pool to select from
 	 * @return The modifed Combinator
 	 */
 	public Combinator permuteOne(final Object... o) {
-		this.factors.add(new Factor(false, 1, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return chooseOne(o);
 	}
 
 	/**
@@ -192,7 +193,7 @@ public class Combinator implements TupleSupplier {
 	 *
 	 * <p>Multiplies the number of total results by N!/(N-2)!, where N is the count of the input.</p>
 	 *
-	 * @param o The pool to choose from
+	 * @param o The pool to select from
 	 * @return The modifed Combinator
 	 */
 	public Combinator permuteTwo(final Object... o) {
@@ -206,7 +207,7 @@ public class Combinator implements TupleSupplier {
 	 *
 	 * <p>Multiplies the number of total results by N!/(N-3)!, where N is the count of the input.</p>
 	 *
-	 * @param o The pool to choose from
+	 * @param o The pool to select from
 	 * @return The modifed Combinator
 	 */
 	public Combinator permuteThree(final Object... o) {
@@ -220,7 +221,7 @@ public class Combinator implements TupleSupplier {
 	 *
 	 * <p>Multiplies the number of total results by N!/(N-4)!, where N is the count of the input.</p>
 	 *
-	 * @param o The pool to choose from
+	 * @param o The pool to select from
 	 * @return The modifed Combinator
 	 */
 	public Combinator permuteFour(final Object... o) {
@@ -234,7 +235,7 @@ public class Combinator implements TupleSupplier {
 	 *
 	 * <p>Multiplies the number of total results by N!/(N-5)!, where N is the count of the input.</p>
 	 *
-	 * @param o The pool to choose from
+	 * @param o The pool to select from
 	 * @return The modifed Combinator
 	 */
 	public Combinator permuteFive(final Object... o) {
@@ -243,32 +244,34 @@ public class Combinator implements TupleSupplier {
 	}
 
 	/**
-	 * <p>Select <tt>count</tt> objects from the input. Tuples may contain the same elements as a tuple returned before,
-	 * but the ordering will be different.</p>
+	 * <p>Select <tt>r</tt> objects from the input. Tuples may contain the same elements as a tuple returned before, but
+	 * the ordering will be different.</p>
 	 *
-	 * <p>Multiplies the number of total results by N!/(N-C)!, where N is the count of the input and C is the count
+	 * <p>Multiplies the number of total results by N!/(N-R)!, where N is the count of the input and R is the count
 	 * selected.</p>
 	 *
-	 * @param o The pool to choose from
+	 * @param r The number of objects selected
+	 * @param o The pool to select from
 	 * @return The modifed Combinator
 	 */
-	public Combinator permuteN(final int count, final Object... o) {
-		this.factors.add(new Factor(false, count, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
+	public Combinator permuteN(final int r, final Object... o) {
+		this.factors.add(new Factor(false, r, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
 		return this;
 	}
 
 	/**
-	 * <p>Select <tt>count</tt> objects from the input. Tuples may contain the same elements as a tuple returned before,
-	 * but the ordering will be different.</p>
+	 * <p>Select <tt>r</tt> objects from the input. Tuples may contain the same elements as a tuple returned before, but
+	 * the ordering will be different.</p>
 	 *
-	 * <p>Multiplies the number of total results by N!/(N-C)!, where N is the count of the input and C is the count
+	 * <p>Multiplies the number of total results by N!/(N-R)!, where N is the count of the input and R is the count
 	 * selected.</p>
 	 *
+	 * @param r The number of objects selected
 	 * @param o The pool to choose from
 	 * @return The modifed Combinator
 	 */
-	public Combinator permuteN(final int count, final List<Object> o) {
-		this.factors.add(new Factor(false, count, () -> 0, () -> Collections.EMPTY_SET, o));
+	public Combinator permuteN(final int r, final List<Object> o) {
+		this.factors.add(new Factor(false, r, () -> 0, () -> Collections.EMPTY_SET, o));
 		return this;
 	}
 
@@ -289,16 +292,7 @@ public class Combinator implements TupleSupplier {
 	}
 
 	/**
-	 * <p>Compute the entire result and return it as two-dimensional array (tuples converted to arrays as well).</p>
-	 *
-	 * @return An Object[][] containing all of the resulting tuples
-	 */
-	public Object[][] array() {
-		return stream().map(t -> t.o).toArray(Object[][]::new);
-	}
-
-	/**
-	 * <p>Iteratively, lazily, return all tuples as dictated by layering of combinations and permutations.</p>
+	 * <p>Iteratively, lazily, return all tuples as dictated by the layering of combinations and permutations.</p>
 	 *
 	 * @return A lazily constructed stream of the resulting tuples
 	 */
@@ -399,7 +393,7 @@ public class Combinator implements TupleSupplier {
 		});
 	}
 
-	private static class Factor {
+	static class Factor {
 		final boolean combine;
 		final int count;
 		final Supplier<Integer> removed;

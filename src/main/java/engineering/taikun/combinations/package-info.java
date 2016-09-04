@@ -12,6 +12,6 @@
  */
 
 /**
- * The combinator and associated tuple classes
+ * The combinator, subspace-filter, and associated tuple classes
  */
 package engineering.taikun.combinations;

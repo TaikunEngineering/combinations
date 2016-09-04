@@ -26,6 +26,8 @@ public class CombinatorTest {
 	@Test
 	public static void main() {
 
+		System.out.println("Combinator test");
+
 		final Stream<Tuple> simple = new Combinator().chooseTwo('a', 'b', 'c').permuteTwo(1, 2, 3).stream();
 
 		assert_(simple.collect(Collectors.toList()).toString().equals(
