@@ -13,21 +13,20 @@
 
 package engineering.taikun.combinations;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.stream.Stream;
 
 import static engineering.taikun.combinations.RelationFilter.ALL_PAIRS;
 import static engineering.taikun.combinations.Tuple.t;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("ALL")
 public class RelationFilterTest {
 
 	@Test
-	public static void main() {
-
-		System.out.println("Relation filter test");
+	public void testRelationFilter() {
 
 		final Stream<Tuple> simple = new RelationFilter(
 				new Combinator().permuteOne(true, false).permuteOne(1, 2, 3).permuteOne('a', 'b', 'c', 'd'),
@@ -44,9 +43,9 @@ public class RelationFilterTest {
 			simple12.add(t(t.o[1], t.o[2]));
 		});
 
-		assert_(simple01.size() == 6);
-		assert_(simple02.size() == 8);
-		assert_(simple12.size() == 12);
+		assertEquals(6, simple01.size());
+		assertEquals(8, simple02.size());
+		assertEquals(12, simple12.size());
 
 		final Combinator advanced_comb = new Combinator()
 				.chooseOne(
@@ -75,13 +74,7 @@ public class RelationFilterTest {
 			advanced3456.add(t(t.o[3], t.o[4], t.o[5], t.o[6]));
 		});
 
-		assert_(advanced0126.size() == 10);
-		assert_(advanced3456.size() == 10);
-
-		System.out.println("passed");
-	}
-
-	public static void assert_(final boolean bool) {
-		if (!bool) throw new RuntimeException();
+		assertEquals(10, advanced0126.size());
+		assertEquals(10, advanced3456.size());
 	}
 }

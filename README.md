@@ -152,29 +152,12 @@ For feature requests, please include a scenario where the hypothetical feature i
 
 ## How to improve Combinations
 
-If you'd like to contribute to Combinations, you'll first need to
-[sign the CLA](https://cla-assistant.io/TaikunEngineering/combinations).
-
 Before you start coding, create a bug/feature-request in the tracker.
  
 Iff I label the issue "Pull candidate", then I will consider pull requests that address the issue.
 
-You are always welcome (with signed CLA) to just attach snippets to the bug report.
+You are always welcome to just attach snippets to the bug report.
 
 ## License
 
 Combinations is freely available under the Apache License v2.
-
-## Misc questions
-
-Supported systems?
-
-- I develop and test using Oracle 1.8 JDKs on Windows 10 and RHEL 7 on AMD64
-- However this should work on any compliant JVM
-- I will reproduce/test on Debian/Ubuntu if necessary
-- All other platforms have [paid support](mailto:support@taikun.engineering) available
-
-Paid support?
-
-- [Available](mailto:support@taikun.engineering), including custom branches, 3rd party code integrations, faster
-response time, private bug tracker

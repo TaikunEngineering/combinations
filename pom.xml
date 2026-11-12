@@ -20,6 +20,7 @@
 	<groupId>engineering.taikun</groupId>
 	<artifactId>combinations</artifactId>
 	<version>1.0.0</version>
+	<packaging>jar</packaging>
 
 	<name>Combinations</name>
 	<description>
@@ -30,7 +31,7 @@
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
 
@@ -44,13 +45,13 @@
 			<name>Philip Smith</name>
 			<email>super_tycoon@taikun.engineering</email>
 			<organization>Taikun Engineering</organization>
-			<organizationUrl>http://taikun.engineering</organizationUrl>
+			<organizationUrl>https://taikun.engineering</organizationUrl>
 		</developer>
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/TaikunEngineering/combinations.git</connection>
-		<developerConnection>scm:git:ssh://github.com:TaikunEngineering/combinations.git</developerConnection>
+		<connection>scm:git:https://github.com/TaikunEngineering/combinations.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/TaikunEngineering/combinations.git</developerConnection>
 		<url>https://github.com/TaikunEngineering/combinations</url>
 	</scm>
 
@@ -59,31 +60,25 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
+				<version>3.16.0</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<release>17</release>
 				</configuration>
 			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19.1</version>
-				<configuration>
-					<suiteXmlFiles>
-						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-					</suiteXmlFiles>
-				</configuration>
+				<version>3.5.6</version>
 			</plugin>
 		</plugins>
 	</build>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>[6,)</version>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>6.1.3</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
