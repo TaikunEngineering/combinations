@@ -27,6 +27,6 @@ import java.util.stream.Stream;
 	 * @return An Object[][] containing all of the resulting tuples
 	 */
 	default Object[][] array() {
-		return get().map(t -> t.o).toArray(Object[][]::new);
+		return get().map(Tuple::o).toArray(Object[][]::new);
 	}
 }

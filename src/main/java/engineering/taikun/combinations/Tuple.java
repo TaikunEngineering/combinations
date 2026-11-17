@@ -18,12 +18,7 @@ import java.util.Arrays;
 /**
  * Basically an Object[]
  */
-public class Tuple {
-	public final Object[] o;
-
-	Tuple(final Object... o) {
-		this.o = o;
-	}
+public record Tuple(Object... o) {
 
 	@Override
 	public String toString() {
@@ -32,14 +27,10 @@ public class Tuple {
 
 	@Override
 	public boolean equals(final Object o1) {
-		if (this == o1)
+		if (this == o1) {
 			return true;
-		if (!(o1 instanceof Tuple))
-			return false;
-
-		final Tuple tuple = (Tuple) o1;
-
-		return Arrays.equals(this.o, tuple.o);
+		}
+		return o1 instanceof final Tuple tuple && Arrays.equals(this.o, tuple.o);
 	}
 
 	@Override

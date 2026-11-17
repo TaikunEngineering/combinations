@@ -15,18 +15,15 @@ package engineering.taikun.combinations;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static engineering.taikun.combinations.Tuple.t;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SuppressWarnings("ALL")
-public class CombinatorTest {
+class CombinatorTest {
 
 	@Test
-	public void testCombinator() {
-
+	void simpleCombinator() {
 		final Stream<Tuple> simple = new Combinator().chooseTwo('a', 'b', 'c').permuteTwo(1, 2, 3).stream();
 
 		assertEquals(
@@ -35,9 +32,12 @@ public class CombinatorTest {
 						"[a, c, 1, 2], [a, c, 1, 3], [a, c, 2, 1], [a, c, 2, 3], [a, c, 3, 1], [a, c, 3, 2], " +
 						"[b, c, 1, 2], [b, c, 1, 3], [b, c, 2, 1], [b, c, 2, 3], [b, c, 3, 1], [b, c, 3, 2]" +
 				']',
-				simple.collect(Collectors.toList()).toString()
+				simple.toList().toString()
 		);
+	}
 
+	@Test
+	void advancedCombinator() {
 		final Stream<Tuple> advanced = new Combinator().permuteThree(
 				t('!', '*'),
 				new Combinator().chooseTwo('x', 'y', 'z')
@@ -57,7 +57,7 @@ public class CombinatorTest {
 						"[y, z, !, *, x, y], [y, z, !, *, x, z], [y, z, x, y, !, *], " +
 						"[y, z, x, y, x, z], [y, z, x, z, !, *], [y, z, x, z, x, y]" +
 				']',
-				advanced.collect(Collectors.toList()).toString()
+				advanced.toList().toString()
 		);
 	}
 }

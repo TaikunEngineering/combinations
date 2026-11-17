@@ -16,37 +16,42 @@ package engineering.taikun.combinations;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static engineering.taikun.combinations.RelationFilter.ALL_PAIRS;
 import static engineering.taikun.combinations.Tuple.t;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SuppressWarnings("ALL")
-public class RelationFilterTest {
+class RelationFilterTest {
 
 	@Test
-	public void testRelationFilter() {
-
+	void simpleRelationFilter() {
 		final Stream<Tuple> simple = new RelationFilter(
 				new Combinator().permuteOne(true, false).permuteOne(1, 2, 3).permuteOne('a', 'b', 'c', 'd'),
 				ALL_PAIRS(3)
 		).get();
 
-		final HashSet simple01 = new HashSet();
-		final HashSet simple02 = new HashSet();
-		final HashSet simple12 = new HashSet();
+		final Set<Tuple> simple01 = new HashSet<>();
+		final Set<Tuple> simple02 = new HashSet<>();
+		final Set<Tuple> simple12 = new HashSet<>();
 
 		simple.forEach(t -> {
-			simple01.add(t(t.o[0], t.o[1]));
-			simple02.add(t(t.o[0], t.o[2]));
-			simple12.add(t(t.o[1], t.o[2]));
+			simple01.add(t(t.o()[0], t.o()[1]));
+			simple02.add(t(t.o()[0], t.o()[2]));
+			simple12.add(t(t.o()[1], t.o()[2]));
 		});
 
-		assertEquals(6, simple01.size());
-		assertEquals(8, simple02.size());
-		assertEquals(12, simple12.size());
+		assertAll(
+				() -> assertEquals(6, simple01.size()),
+				() -> assertEquals(8, simple02.size()),
+				() -> assertEquals(12, simple12.size())
+		);
+	}
 
+	@Test
+	void advancedRelationFilter() {
 		final Combinator advanced_comb = new Combinator()
 				.chooseOne(
 						t(true, false, false),
@@ -66,15 +71,17 @@ public class RelationFilterTest {
 
 		final Stream<Tuple> advanced = new RelationFilter(advanced_comb, t(0, 1, 2, 6), t(3, 4, 5, 6)).get();
 
-		final HashSet advanced0126 = new HashSet();
-		final HashSet advanced3456 = new HashSet();
+		final Set<Tuple> advanced0126 = new HashSet<>();
+		final Set<Tuple> advanced3456 = new HashSet<>();
 
 		advanced.forEach(t -> {
-			advanced0126.add(t(t.o[0], t.o[1], t.o[2], t.o[6]));
-			advanced3456.add(t(t.o[3], t.o[4], t.o[5], t.o[6]));
+			advanced0126.add(t(t.o()[0], t.o()[1], t.o()[2], t.o()[6]));
+			advanced3456.add(t(t.o()[3], t.o()[4], t.o()[5], t.o()[6]));
 		});
 
-		assertEquals(10, advanced0126.size());
-		assertEquals(10, advanced3456.size());
+		assertAll(
+				() -> assertEquals(10, advanced0126.size()),
+				() -> assertEquals(10, advanced3456.size())
+		);
 	}
 }

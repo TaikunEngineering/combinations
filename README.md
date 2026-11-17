@@ -116,11 +116,10 @@ new RelationFilter(advanced_comb, t(0, 1, 2, 6), t(3, 4, 5, 6)).get();
 [false, true, false, false, false, true, false]
 ```
 
-### As a TestNG data provider
+### As a JUnit parameterized test source
 
 ```java
-@DataProvider(name = "allpairs", parallel = true)
-public static Object[][] data() {
+static Object[][] allPairs() {
   return new RelationFilter(
       new Combinator()
           .permuteOne("triangle", "square", "circle")
@@ -130,8 +129,9 @@ public static Object[][] data() {
   ).array();
 }
 
-@Test(dataProvider = "allpairs")
-public static void test(Shape shape, boolean filled, Color gradient1, Color gradient2) {
+@ParameterizedTest
+@MethodSource("allPairs")
+void test(Shape shape, String style, Color gradient1, Color gradient2) {
   ...
 }
 ```
@@ -140,7 +140,7 @@ public static void test(Shape shape, boolean filled, Color gradient1, Color grad
 
 Use Maven.
 
-Alternatively you can just run javac 1.8+ on everything and jar the resulting goo.
+Alternatively you can just run javac 17+ on everything and jar the resulting goo.
 
 ## How to submit bug reports / feature requests
 

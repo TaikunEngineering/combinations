@@ -18,11 +18,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-@SuppressWarnings("AssignmentToNull")
 public class RelationFilter implements TupleSupplier {
 
-	final ArrayList<Tuple> data;
-	final Tuple[] relations;
+	private final ArrayList<Tuple> data;
+	private final Tuple[] relations;
 
 	/**
 	 * <p>This class takes a {@link TupleSupplier} and produces a subset of the supplier's output such that every unique
@@ -34,7 +33,7 @@ public class RelationFilter implements TupleSupplier {
 	 * relation, not just pairs).</p>
 	 *
 	 * <p>Relations are tuples of integers that specify the relations. You can also supply a {@code Stream<Tuple>} (like
-	 * those produced by {@link RelationFilter#ALL_PAIRS(int)}</p>
+	 * those produced by {@link RelationFilter#ALL_PAIRS(int)}).</p>
 	 *
 	 * <h3>USAGE WARNINGS</h3>
 	 *
@@ -45,7 +44,7 @@ public class RelationFilter implements TupleSupplier {
 	 * <p>No relation optimization is performed. Specifying ALL_PAIRS and ALL_TRIPLES will just cause things to take
 	 * longer and use more memory.</p>
 	 *
-	 * <p>Lots of parameters (wide tuple) -> Lots of relations that each have their own witness sets<br />
+	 * <p>Lots of parameters (wide tuple) -> Lots of relations that each have their own witness sets<br>
 	 * Lots of options for parameters -> (Very) large witness sets for affected relations</p>
 	 *
 	 * <p>As hinted at above, this class does not algorithmically construct a minimal, covering subset. It randomly
@@ -124,10 +123,10 @@ public class RelationFilter implements TupleSupplier {
 		Collections.shuffle(this.data, new Random(52));
 
 		this.relations = Arrays.stream(relations).flatMap(relation -> {
-			if (relation instanceof Stream) {
-				return (Stream<Tuple>) relation;
+			if (relation instanceof final Stream<?> stream) {
+				return stream.map(Tuple.class::cast);
 			} else {
-				return Stream.of(relation);
+				return Stream.of((Tuple) relation);
 			}
 		}).toArray(Tuple[]::new);
 	}
@@ -138,19 +137,19 @@ public class RelationFilter implements TupleSupplier {
 		return this.data.stream().filter(acceptor::accept);
 	}
 
-	private class Acceptor {
+	private final class Acceptor {
 
-		HashSet[] sets;
+		private final HashSet<Tuple>[] sets;
 
 		Acceptor() {
 			this.sets = new HashSet[RelationFilter.this.relations.length];
 
 			for (int i = 0; i < this.sets.length; i++) {
-				this.sets[i] = new HashSet();
+				this.sets[i] = new HashSet<>();
 			}
 		}
 
-		boolean accept(final Tuple tuple) {
+		synchronized boolean accept(final Tuple tuple) {
 
 			boolean witnessed = true;
 
@@ -158,10 +157,10 @@ public class RelationFilter implements TupleSupplier {
 
 				final Tuple relation = RelationFilter.this.relations[i];
 
-				final Object[] subset = new Object[relation.o.length];
+				final Object[] subset = new Object[relation.o().length];
 
-				for (int j = 0; j < relation.o.length; j++) {
-					subset[j] = tuple.o[(Integer) relation.o[j]];
+				for (int j = 0; j < relation.o().length; j++) {
+					subset[j] = tuple.o()[(Integer) relation.o()[j]];
 				}
 
 				final Tuple subtuple = new Tuple(subset);
@@ -214,6 +213,6 @@ public class RelationFilter implements TupleSupplier {
 	 * @return A stream of all k-wise relations
 	 */
 	public static Stream<Tuple> ALL_K_SETS(final int n, final int k) {
-		return new Combinator().chooseR(k, IntStream.range(0, n).mapToObj(i -> i).toArray()).stream();
+		return new Combinator().chooseR(k, IntStream.range(0, n).boxed().toList()).stream();
 	}
 }

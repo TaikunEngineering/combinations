@@ -14,8 +14,11 @@
 package engineering.taikun.combinations;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static engineering.taikun.combinations.Tuple.t;
 
@@ -71,8 +74,19 @@ public class Combinator implements TupleSupplier {
 
 	private static final Object[] EMPTY_OBJ_AR = new Object[0];
 	private static final Tuple PLACEHOLDER = t(EMPTY_OBJ_AR);
+	private static final IntSupplier ZERO_SUPPLIER = () -> 0;
+	private static final Supplier<Set<Integer>> EMPTY_SET_SUPPLIER = Set::of;
 
-	final ArrayList<Factor> factors = new ArrayList<>();
+	private final ArrayList<Factor> factors = new ArrayList<>();
+
+	private Combinator add_factor(final boolean combine, final int count, final List<?> objects) {
+		if (count <= 0) {
+			throw new IllegalArgumentException("count must be a positive integer: " + count);
+		}
+
+		this.factors.add(new Factor(combine, count, ZERO_SUPPLIER, EMPTY_SET_SUPPLIER, objects));
+		return this;
+	}
 
 	/**
 	 * <p>Choose one object from the input.</p>
@@ -80,11 +94,10 @@ public class Combinator implements TupleSupplier {
 	 * <p>Multiplies the number of total results by N, where N is the count of the input.</p>
 	 *
 	 * @param o The pool to choose from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator chooseOne(final Object... o) {
-		this.factors.add(new Factor(true, 1, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(true, 1, Arrays.asList(o));
 	}
 
 	/**
@@ -94,11 +107,10 @@ public class Combinator implements TupleSupplier {
 	 * <p>Multiplies the number of total results by N!/((N-2)!2!), where N is the count of the input.</p>
 	 *
 	 * @param o The pool to choose from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator chooseTwo(final Object... o) {
-		this.factors.add(new Factor(true, 2, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(true, 2, Arrays.asList(o));
 	}
 
 	/**
@@ -108,11 +120,10 @@ public class Combinator implements TupleSupplier {
 	 * <p>Multiplies the number of total results by N!/((N-3)!3!), where N is the count of the input.</p>
 	 *
 	 * @param o The pool to choose from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator chooseThree(final Object... o) {
-		this.factors.add(new Factor(true, 3, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(true, 3, Arrays.asList(o));
 	}
 
 	/**
@@ -122,11 +133,10 @@ public class Combinator implements TupleSupplier {
 	 * <p>Multiplies the number of total results by N!/((N-4)!4!), where N is the count of the input.</p>
 	 *
 	 * @param o The pool to choose from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator chooseFour(final Object... o) {
-		this.factors.add(new Factor(true, 4, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(true, 4, Arrays.asList(o));
 	}
 
 	/**
@@ -136,15 +146,14 @@ public class Combinator implements TupleSupplier {
 	 * <p>Multiplies the number of total results by N!/((N-5)!5!), where N is the count of the input.</p>
 	 *
 	 * @param o The pool to choose from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator chooseFive(final Object... o) {
-		this.factors.add(new Factor(true, 5, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(true, 5, Arrays.asList(o));
 	}
 
 	/**
-	 * <p>Choose <tt>r</tt> objects from the supplied pool. Tuples that contain the same elements as a tuple returned
+	 * <p>Choose {@code r} objects from the supplied pool. Tuples that contain the same elements as a tuple returned
 	 * before, but in a different order, are ignored.</p>
 	 *
 	 * <p>Multiplies the number of total results by N!/((N-R)!R!), where N is the count of the input and R is the count
@@ -152,15 +161,14 @@ public class Combinator implements TupleSupplier {
 	 *
 	 * @param r The number of objects chosen
 	 * @param o The pool to choose from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator chooseR(final int r, final Object... o) {
-		this.factors.add(new Factor(true, r, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(true, r, Arrays.asList(o));
 	}
 
 	/**
-	 * <p>Choose <tt>r</tt> objects from the supplied pool. Tuples that contain the same elements as a tuple returned
+	 * <p>Choose {@code r} objects from the supplied pool. Tuples that contain the same elements as a tuple returned
 	 * before, but in a different order, are ignored.</p>
 	 *
 	 * <p>Multiplies the number of total results by N!/((N-R)!R!), where N is the count of the input and R is the count
@@ -168,11 +176,10 @@ public class Combinator implements TupleSupplier {
 	 *
 	 * @param r The number of objects chosen
 	 * @param o The pool to choose from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
-	public Combinator chooseR(final int r, final List<Object> o) {
-		this.factors.add(new Factor(true, r, () -> 0, () -> Collections.EMPTY_SET, o));
-		return this;
+	public Combinator chooseR(final int r, final Collection<?> o) {
+		return add_factor(true, r, new ArrayList<>(o));
 	}
 
 	/**
@@ -181,7 +188,7 @@ public class Combinator implements TupleSupplier {
 	 * <p>Multiplies the number of total results by N, where N is the count of the input.</p>
 	 *
 	 * @param o The pool to select from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator permuteOne(final Object... o) {
 		return chooseOne(o);
@@ -194,11 +201,10 @@ public class Combinator implements TupleSupplier {
 	 * <p>Multiplies the number of total results by N!/(N-2)!, where N is the count of the input.</p>
 	 *
 	 * @param o The pool to select from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator permuteTwo(final Object... o) {
-		this.factors.add(new Factor(false, 2, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(false, 2, Arrays.asList(o));
 	}
 
 	/**
@@ -208,11 +214,10 @@ public class Combinator implements TupleSupplier {
 	 * <p>Multiplies the number of total results by N!/(N-3)!, where N is the count of the input.</p>
 	 *
 	 * @param o The pool to select from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator permuteThree(final Object... o) {
-		this.factors.add(new Factor(false, 3, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(false, 3, Arrays.asList(o));
 	}
 
 	/**
@@ -222,11 +227,10 @@ public class Combinator implements TupleSupplier {
 	 * <p>Multiplies the number of total results by N!/(N-4)!, where N is the count of the input.</p>
 	 *
 	 * @param o The pool to select from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator permuteFour(final Object... o) {
-		this.factors.add(new Factor(false, 4, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(false, 4, Arrays.asList(o));
 	}
 
 	/**
@@ -236,15 +240,14 @@ public class Combinator implements TupleSupplier {
 	 * <p>Multiplies the number of total results by N!/(N-5)!, where N is the count of the input.</p>
 	 *
 	 * @param o The pool to select from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator permuteFive(final Object... o) {
-		this.factors.add(new Factor(false, 5, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(false, 5, Arrays.asList(o));
 	}
 
 	/**
-	 * <p>Select <tt>r</tt> objects from the input. Tuples may contain the same elements as a tuple returned before, but
+	 * <p>Select {@code r} objects from the input. Tuples may contain the same elements as a tuple returned before, but
 	 * the ordering will be different.</p>
 	 *
 	 * <p>Multiplies the number of total results by N!/(N-R)!, where N is the count of the input and R is the count
@@ -252,15 +255,14 @@ public class Combinator implements TupleSupplier {
 	 *
 	 * @param r The number of objects selected
 	 * @param o The pool to select from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
 	public Combinator permuteN(final int r, final Object... o) {
-		this.factors.add(new Factor(false, r, () -> 0, () -> Collections.EMPTY_SET, Arrays.asList(o)));
-		return this;
+		return add_factor(false, r, Arrays.asList(o));
 	}
 
 	/**
-	 * <p>Select <tt>r</tt> objects from the input. Tuples may contain the same elements as a tuple returned before, but
+	 * <p>Select {@code r} objects from the input. Tuples may contain the same elements as a tuple returned before, but
 	 * the ordering will be different.</p>
 	 *
 	 * <p>Multiplies the number of total results by N!/(N-R)!, where N is the count of the input and R is the count
@@ -268,27 +270,55 @@ public class Combinator implements TupleSupplier {
 	 *
 	 * @param r The number of objects selected
 	 * @param o The pool to choose from
-	 * @return The modifed Combinator
+	 * @return The modified Combinator
 	 */
-	public Combinator permuteN(final int r, final List<Object> o) {
-		this.factors.add(new Factor(false, r, () -> 0, () -> Collections.EMPTY_SET, o));
-		return this;
+	public Combinator permuteN(final int r, final Collection<?> o) {
+		return add_factor(false, r, new ArrayList<>(o));
 	}
 
 	/**
 	 * <p>Iteratively, lazily, return all tuples as dictated by the layering of combinations and permutations.</p>
 	 *
+	 * <p>Note: tuple generation is inherently sequential; the returned stream does not split for parallel execution.</p>
+	 *
 	 * @return A lazily constructed stream of the resulting tuples
 	 */
 	public Stream<Tuple> stream() {
 
-		Stream stream = Stream.of(t());
+		Stream<Tuple> stream = Stream.of(t());
 
 		for (final Factor factor : this.factors) {
 			stream = pump(stream, factor);
 		}
 
-		return stream;
+		final Spliterator<Tuple> base = stream.spliterator();
+
+		return StreamSupport.stream(new Spliterator<Tuple>() {
+			@Override
+			public boolean tryAdvance(final Consumer<? super Tuple> action) {
+				return base.tryAdvance(action);
+			}
+
+			@Override
+			public void forEachRemaining(final Consumer<? super Tuple> action) {
+				base.forEachRemaining(action);
+			}
+
+			@Override
+			public Spliterator<Tuple> trySplit() {
+				return null;
+			}
+
+			@Override
+			public long estimateSize() {
+				return base.estimateSize();
+			}
+
+			@Override
+			public int characteristics() {
+				return base.characteristics() & ~Spliterator.SUBSIZED;
+			}
+		}, false).onClose(stream::close);
 	}
 
 	/**
@@ -302,17 +332,17 @@ public class Combinator implements TupleSupplier {
 	}
 
 	private static Stream<Tuple> pump(final Stream<Tuple> stream, final Factor factor) {
-		if (factor.count == 1) {
+		if (factor.count() == 1) {
 
 			return stream.flatMap(tuple -> factorToStream(factor, true).map(o -> {
 
-				final Object[] temp = Arrays.copyOf(tuple.o, tuple.o.length + o.o.length);
-				System.arraycopy(o.o, 0, temp, tuple.o.length, o.o.length);
+				final Object[] temp = Arrays.copyOf(tuple.o(), tuple.o().length + o.o().length);
+				System.arraycopy(o.o(), 0, temp, tuple.o().length, o.o().length);
 				return t(temp);
 
 			}));
 
-		} else if (factor.combine) {
+		} else if (factor.combine()) {
 
 			return stream.flatMap(tuple -> {
 
@@ -322,14 +352,14 @@ public class Combinator implements TupleSupplier {
 
 					count[0]++;
 
-					final Object[] temp = Arrays.copyOf(tuple.o, tuple.o.length + o.o.length);
-					System.arraycopy(o.o, 0, temp, tuple.o.length, o.o.length);
+					final Object[] temp = Arrays.copyOf(tuple.o(), tuple.o().length + o.o().length);
+					System.arraycopy(o.o(), 0, temp, tuple.o().length, o.o().length);
 					return t(temp);
 
 				});
 
 				return pump(stream2, new Factor(
-						true, factor.count - 1, () -> factor.removed.get() + count[0], factor.black_indexes, factor.objects
+						true, factor.count() - 1, () -> factor.removed().getAsInt() + count[0], factor.black_indexes(), factor.objects()
 				));
 
 			});
@@ -345,20 +375,20 @@ public class Combinator implements TupleSupplier {
 					count[0]++;
 
 					if (o == PLACEHOLDER) {
-						return (Stream<Tuple>) (Object) Stream.empty();
+						return Stream.empty();
 					}
 
-					final Object[] temp = Arrays.copyOf(tuple.o, tuple.o.length + o.o.length);
-					System.arraycopy(o.o, 0, temp, tuple.o.length, o.o.length);
+					final Object[] temp = Arrays.copyOf(tuple.o(), tuple.o().length + o.o().length);
+					System.arraycopy(o.o(), 0, temp, tuple.o().length, o.o().length);
 					return Stream.of(t(temp));
 
 				});
 
-				return pump(stream2, new Factor(false, factor.count - 1, factor.removed, () -> {
-					final HashSet<Integer> black_copy = new HashSet<>(factor.black_indexes.get());
+				return pump(stream2, new Factor(false, factor.count() - 1, factor.removed(), () -> {
+					final Set<Integer> black_copy = new HashSet<>(factor.black_indexes().get());
 					black_copy.add(count[0]);
 					return black_copy;
-				}, factor.objects
+				}, factor.objects()
 				));
 
 			});
@@ -368,19 +398,17 @@ public class Combinator implements TupleSupplier {
 
 	private static Stream<Tuple> factorToStream(final Factor factor, final boolean skip_empty) {
 		final int[] count = { 0 };
-		final Set<Integer> black_indexes = factor.black_indexes.get();
+		final Set<Integer> black_indexes = factor.black_indexes().get();
 
-		count[0] = 0;
-
-		return factor.objects.stream().flatMap(o -> {
-			if (o instanceof TupleSupplier) {
-				return ((TupleSupplier) o).get();
-			} else if (o instanceof Tuple) {
-				return Stream.of((Tuple) o);
+		return factor.objects().stream().flatMap(o -> {
+			if (o instanceof final TupleSupplier supplier) {
+				return supplier.get();
+			} else if (o instanceof final Tuple tuple) {
+				return Stream.of(tuple);
 			} else {
 				return Stream.of(t(o));
 			}
-		}).skip(factor.removed.get()).flatMap(o -> {
+		}).skip(factor.removed().getAsInt()).flatMap(o -> {
 			if (black_indexes.contains(count[0]++)) {
 				if (skip_empty) {
 					return Stream.empty();
@@ -393,22 +421,12 @@ public class Combinator implements TupleSupplier {
 		});
 	}
 
-	static class Factor {
-		final boolean combine;
-		final int count;
-		final Supplier<Integer> removed;
-		final Supplier<Set<Integer>> black_indexes;
-		final List<Object> objects;
-
-		Factor(
-				final boolean combine, final int count, final Supplier<Integer> removed,
-				final Supplier<Set<Integer>> black_indexes, final List<Object> objects
-		) {
-			this.combine = combine;
-			this.count = count;
-			this.removed = removed;
-			this.black_indexes = black_indexes;
-			this.objects = objects;
-		}
+	record Factor(
+			boolean combine,
+			int count,
+			IntSupplier removed,
+			Supplier<Set<Integer>> black_indexes,
+			List<?> objects
+	) {
 	}
 }
